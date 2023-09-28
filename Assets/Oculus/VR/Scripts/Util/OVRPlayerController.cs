@@ -20,6 +20,7 @@
 
 using System;
 using UnityEngine;
+using UnityEngine.XR;
 
 /// <summary>
 /// Controls the player's movement in virtual reality.
@@ -343,7 +344,6 @@ public class OVRPlayerController : MonoBehaviour
 
     public virtual void UpdateMovement()
     {
-        Debug.Log("aqui");
         //todo: enable for Unity Input System
 #if ENABLE_LEGACY_INPUT_MANAGER
         if (HaltUpdateMovement)

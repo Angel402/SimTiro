@@ -57,12 +57,12 @@ using UnityEngine.Rendering;
 #if USING_XR_SDK
 using UnityEngine.XR;
 using UnityEngine.Experimental.XR;
+using UnityEngine.XR.OpenXR;
 #endif
 
 #if USING_XR_SDK_OPENXR
 using Meta.XR;
 #endif
-
 using Settings = UnityEngine.XR.XRSettings;
 using Node = UnityEngine.XR.XRNode;
 
@@ -2248,7 +2248,7 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
         //For now, in XR SDK, only initialize if OVRPlugin is initialized.
         InitOVRManager();
 #else
-        if (OVRPlugin.initialized)
+        /*if (OVRPlugin.initialized)*/
             InitOVRManager();
 #endif
     }
