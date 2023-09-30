@@ -55,7 +55,7 @@ namespace Utilities
 
         private void SetIpAddress() {
             transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
-            transport.ConnectionData.Address = ip.text;
+            transport.ConnectionData.Address = $"192.168.100.2";
         }
     }
 }

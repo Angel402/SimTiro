@@ -21,12 +21,13 @@
 using System;
 using UnityEngine;
 using UnityEngine.XR;
+using Unity.Netcode;
 
 /// <summary>
 /// Controls the player's movement in virtual reality.
 /// </summary>
 [RequireComponent(typeof(CharacterController))]
-public class OVRPlayerController : MonoBehaviour
+public class OVRPlayerController : NetworkBehaviour
 {
     /// <summary>
     /// The rate acceleration during movement.
@@ -173,14 +174,19 @@ public class OVRPlayerController : MonoBehaviour
     private bool ReadyToSnapTurn;
 
     private bool playerControllerEnabled = false;
+    private bool _qPressed, _ePressed;
+
+    private bool IsPlayerObject => NetworkObject == NetworkManager.LocalClient.PlayerObject;
 
     void Start()
     {
+        if (!IsPlayerObject) return; 
         // Add eye-depth as a camera offset from the player controller
         var p = CameraRig.transform.localPosition;
         p.z = OVRManager.profile.eyeDepth;
         CameraRig.transform.localPosition = p;
     }
+
 
     void Awake()
     {
@@ -246,14 +252,48 @@ public class OVRPlayerController : MonoBehaviour
 #if ENABLE_LEGACY_INPUT_MANAGER
 
         //Use keys to ratchet rotation
-        if (Input.GetKeyDown(KeyCode.Q))
+        if (IsOwner && Input.GetKeyDown(KeyCode.Q)) QPressedServerRpc();
+        if (_qPressed)
+        {
             buttonRotation -= RotationRatchet;
+            _qPressed = false;
+        }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (IsOwner && Input.GetKeyDown(KeyCode.E)) EPressedServerRpc();
+        if (_ePressed)
+        {
             buttonRotation += RotationRatchet;
+            _ePressed = false;
+        }
 #endif
     }
 
+    [ServerRpc]        
+    private void QPressedServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        QPressedClientRpc(NetworkObjectId);
+    }
+    
+    [ClientRpc]        
+    private void QPressedClientRpc(ulong gameObjectP)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRPlayerController>()._qPressed = true;
+    }
+    
+    [ServerRpc]        
+    private void EPressedServerRpc(ServerRpcParams serverRpcParams = default)
+    {
+        EPressedClientRpc(NetworkObjectId);
+    }
+    
+    [ClientRpc]        
+    private void EPressedClientRpc(ulong gameObjectP)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRPlayerController>()._ePressed = true;
+    }
+    
     protected virtual void UpdateController()
     {
         if (useProfileData)

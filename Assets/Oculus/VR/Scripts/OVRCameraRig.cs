@@ -25,6 +25,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.XR;
 using Node = UnityEngine.XR.XRNode;
@@ -33,7 +34,7 @@ using Node = UnityEngine.XR.XRNode;
 /// A head-tracked stereoscopic virtual reality camera rig.
 /// </summary>
 [ExecuteInEditMode]
-public class OVRCameraRig : MonoBehaviour
+public class OVRCameraRig : NetworkBehaviour
 {
     /// <summary>
     /// The left eye camera.
@@ -180,6 +181,8 @@ public class OVRCameraRig : MonoBehaviour
     protected Camera _rightEyeCamera;
 
     private Matrix4x4 _previousTrackingSpaceTransform;
+    private Vector3 _leftEyePosition, _rightEyePosition; 
+    private Quaternion _leftEyeRotation, _rightEyeRotation;
 
     #region Unity Messages
 
@@ -290,19 +293,23 @@ public class OVRCameraRig : MonoBehaviour
                 Quaternion rightEyeRotation = Quaternion.identity;
 
                 if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.LeftEye, NodeStatePropertyType.Position,
-                        OVRPlugin.Node.EyeLeft, OVRPlugin.Step.Render, out leftEyePosition))
-                    leftEyeAnchor.localPosition = leftEyePosition;
+                    OVRPlugin.Node.EyeLeft, OVRPlugin.Step.Render, out leftEyePosition))
+                    LeftEyePositionServerRpc(leftEyePosition);
+                leftEyeAnchor.localPosition = _leftEyePosition;
                 if (OVRNodeStateProperties.GetNodeStatePropertyVector3(Node.RightEye, NodeStatePropertyType.Position,
                         OVRPlugin.Node.EyeRight, OVRPlugin.Step.Render, out rightEyePosition))
-                    rightEyeAnchor.localPosition = rightEyePosition;
+                    RightEyePositionServerRpc(rightEyePosition);
+                rightEyeAnchor.localPosition = _rightEyePosition;
                 if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.LeftEye,
                         NodeStatePropertyType.Orientation, OVRPlugin.Node.EyeLeft, OVRPlugin.Step.Render,
-                        out leftEyeRotation))
-                    leftEyeAnchor.localRotation = leftEyeRotation;
+                        out leftEyeRotation)) 
+                    LeftEyeRotationServerRpc(leftEyeRotation);
+                leftEyeAnchor.localRotation = _leftEyeRotation;
                 if (OVRNodeStateProperties.GetNodeStatePropertyQuaternion(Node.RightEye,
                         NodeStatePropertyType.Orientation, OVRPlugin.Node.EyeRight, OVRPlugin.Step.Render,
                         out rightEyeRotation))
-                    rightEyeAnchor.localRotation = rightEyeRotation;
+                    RightEyeRotationServerRpc(rightEyeRotation);
+                rightEyeAnchor.localRotation = _rightEyeRotation;
             }
         }
 
@@ -473,6 +480,58 @@ public class OVRCameraRig : MonoBehaviour
         CheckForTrackingSpaceChangesAndRaiseEvent();
     }
 
+    [ServerRpc]        
+    private void LeftEyePositionServerRpc(Vector3 param, ServerRpcParams serverRpcParams = default)
+    {
+        LeftEyePositionClientRpc(NetworkObjectId, param);
+    }
+    
+    [ClientRpc]        
+    private void LeftEyePositionClientRpc(ulong gameObjectP, Vector3 param)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRCameraRig>()._leftEyePosition = param;
+    }
+    
+    [ServerRpc]        
+    private void RightEyePositionServerRpc(Vector3 param, ServerRpcParams serverRpcParams = default)
+    {
+        RightEyePositionClientRpc(NetworkObjectId, param);
+    }
+    
+    [ClientRpc]        
+    private void RightEyePositionClientRpc(ulong gameObjectP, Vector3 param)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRCameraRig>()._rightEyePosition = param;
+    }
+    
+    [ServerRpc]        
+    private void LeftEyeRotationServerRpc(Quaternion param, ServerRpcParams serverRpcParams = default)
+    {
+        LeftEyeRotationClientRpc(NetworkObjectId, param);
+    }
+    
+    [ClientRpc]        
+    private void LeftEyeRotationClientRpc(ulong gameObjectP, Quaternion param)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRCameraRig>()._leftEyeRotation = param;
+    }
+    
+    [ServerRpc]        
+    private void RightEyeRotationServerRpc(Quaternion param, ServerRpcParams serverRpcParams = default)
+    {
+        RightEyeRotationClientRpc(NetworkObjectId, param);
+    }
+    
+    [ClientRpc]        
+    private void RightEyeRotationClientRpc(ulong gameObjectP, Quaternion param)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        networkBehaviour.GetComponentInChildren<OVRCameraRig>()._rightEyeRotation = param;
+    }
+    
     protected virtual void OnBeforeRenderCallback()
     {
         if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus) //Restrict late-update to only Oculus devices

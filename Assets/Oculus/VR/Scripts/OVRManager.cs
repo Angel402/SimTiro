@@ -1992,8 +1992,9 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
 
     public static bool OVRManagerinitialized = false;
 
-    private void InitOVRManager()
+    public void InitOVRManager()
     {
+        if (!OVRPlugin.initialized) return;
         using var marker = new OVRTelemetryMarker(OVRTelemetryConstants.OVRManager.MarkerId.Init);
         marker.AddSDKVersionAnnotation();
 
@@ -2249,7 +2250,7 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
         InitOVRManager();
 #else
         /*if (OVRPlugin.initialized)*/
-            InitOVRManager();
+            /*InitOVRManager();*/
 #endif
     }
 
@@ -2357,7 +2358,7 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
             if (currentDisplaySubsystem == null || currentDisplaySubsystemDescriptor == null || !OVRPlugin.initialized)
                 return;
             //If we're using the XR SDK and the display subsystem is present, and OVRPlugin is initialized, we can init OVRManager
-            InitOVRManager();
+            /*InitOVRManager();*/
         }
 #endif
 
@@ -2373,8 +2374,12 @@ public class OVRManager : MonoBehaviour, OVRMixedRealityCaptureConfiguration
 #if UNITY_EDITOR
         if (_scriptsReloaded)
         {
+            Debug.Log("scriptsreloaded");
             _scriptsReloaded = false;
-            instance = this;
+            if (OVRManagerinitialized)
+            {
+                instance = this;
+            }
             Initialize();
         }
 #endif
