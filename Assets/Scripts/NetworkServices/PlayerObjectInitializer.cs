@@ -8,28 +8,23 @@ namespace NetworkServices
         [SerializeField] private GameObject playerCamera;
         [SerializeField] private OVRManager ovrManager;
         [SerializeField] private GameObject networkSoldier, ownSoldier;
-        public void Initialize()
-        {
-            if (NetworkObject == NetworkManager.LocalClient.PlayerObject)
-            {
-                Debug.Log("initialize");
-                playerCamera.SetActive(true);
-            }
-        }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            if (NetworkObject == NetworkManager.LocalClient.PlayerObject)
+            if (IsOwner)
             {
-                networkSoldier.SetActive(false);
-                ownSoldier.SetActive(true);
+                /*networkSoldier.SetActive(false);
+                ownSoldier.SetActive(true);*/
+                playerCamera.SetActive(true);
+                GetComponentInChildren<OVRManager>().InitOVRManager();
             }
             else
             {
-                networkSoldier.SetActive(true);
-                ownSoldier.SetActive(false);
+                /*networkSoldier.SetActive(true);
+                ownSoldier.SetActive(false);*/
             }
+            transform.position = new Vector3(transform.position.x, 1.1f, transform.position.z);
         }
     }
 }

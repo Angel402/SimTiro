@@ -7,7 +7,8 @@ using EnemyAI;
 public class AttackAction : Action
 {
 	private readonly float startShootDelay = 0.2f; // Delay before start shooting.
-	private readonly float aimAngleGap = 30f;      // Minimum angle gap between current and desired aim orientations.
+	private readonly float aimAngleGap = 30f;
+	// Minimum angle gap between current and desired aim orientations.
 
 	// The act function, called on Update() (State controller - current state - action).
 	public override void Act(StateController controller)
@@ -89,6 +90,11 @@ public class AttackAction : Action
 		Ray ray = new Ray(controller.enemyAnimation.gunMuzzle.position, shotDirection.normalized + imprecision);
 		if (Physics.Raycast(ray, out RaycastHit hit, controller.viewRadius, controller.generalStats.shotMask.value))
 		{
+			var impactEffect = ImpactEffectManager.Instance.GetImpactEffect(hit.collider.gameObject);
+			if (impactEffect == null) return;
+			GameObject B = Instantiate(impactEffect, hit.point, Quaternion.identity);
+			B.transform.LookAt(hit.point + hit.normal);
+			Destroy(B, 2);
 			// Hit something organic? Consider all layers in target mask as organic.
 			bool isOrganic = ((1 << hit.transform.root.gameObject.layer) & controller.generalStats.targetMask) != 0;
 			DoShot(controller, ray.direction, hit.point, hit.normal, isOrganic, hit.transform);
@@ -99,6 +105,8 @@ public class AttackAction : Action
 			DoShot(controller, ray.direction, ray.origin + (ray.direction * 500f));
 		}
 	}
+	
+	
 	// Draw shot and extra assets.
 	private void DoShot(StateController controller, Vector3 direction, Vector3 hitPoint,
 		Vector3 hitNormal = default, bool organic = false, Transform target = null)
@@ -131,7 +139,7 @@ public class AttackAction : Action
 			HealthManager targetHealth = target.GetComponent<HealthManager>();
 			if(targetHealth)
 			{
-				targetHealth.TakeDamage(hitPoint, direction, controller.classStats.bulletDamage, target.GetComponent<Collider>(), controller.gameObject);
+				targetHealth.TakeDamageMessageSender(hitPoint, direction, controller.classStats.bulletDamage, target.gameObject, controller.gameObject);
 			}
 		}
 		// Play shot audio clip at shot position.

@@ -296,6 +296,7 @@ public class OVRPlayerController : NetworkBehaviour
     
     protected virtual void UpdateController()
     {
+        if(!IsOwner) return;
         if (useProfileData)
         {
             if (InitialPose == null)
@@ -374,14 +375,29 @@ public class OVRPlayerController : NetworkBehaviour
         Vector3 predictedXZ = Vector3.Scale((Controller.transform.localPosition + moveDirection), new Vector3(1, 0, 1));
 
         // Move contoller
+        MoveServerRpc(moveDirection);
         Controller.Move(moveDirection);
         Vector3 actualXZ = Vector3.Scale(Controller.transform.localPosition, new Vector3(1, 0, 1));
 
         if (predictedXZ != actualXZ)
             MoveThrottle += (actualXZ - predictedXZ) / (SimulationRate * Time.deltaTime);
     }
+    
+    [ServerRpc]
+    private void MoveServerRpc(Vector3 moveDirection)
+    {
+        MoveClientRpc(moveDirection);
+    }
 
+    [ClientRpc]
+    private void MoveClientRpc(Vector3 moveDirection)
+    {
+        if(IsOwner) return;
+        Controller.Move(moveDirection);
+    }
 
+    
+    
     public virtual void UpdateMovement()
     {
         //todo: enable for Unity Input System

@@ -6,7 +6,7 @@ namespace NetworkServices
     public class SceneInitializer : NetworkBehaviour
     {
         
-        public override void OnNetworkSpawn()
+        /*public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
             var playerObject = NetworkManager.LocalClient.PlayerObject;
@@ -15,6 +15,6 @@ namespace NetworkServices
                 new Vector3(playerObjectPosition.x, 1, playerObjectPosition.z);
             playerObject.GetComponent<PlayerObjectInitializer>().Initialize();
             playerObject.GetComponentInChildren<OVRManager>().InitOVRManager();
-        }
+        }*/
     }
 }

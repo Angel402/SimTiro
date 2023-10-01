@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using System;
+using Unity.Netcode;
+using UnityEngine;
 using UnityEngine.AI;
+using Object = UnityEngine.Object;
 
 namespace EnemyAI
 {
@@ -16,6 +19,8 @@ namespace EnemyAI
 		[Tooltip("Use headshot damage multiplier?")]
 		public bool headshot;
 
+		public Action<EnemyHealth> OnKilled;
+
 		private float totalHealth;                                  // The total NPC initial health.
 		private Transform weapon;                                   // The NPC weapon.
 		private Transform hud;                                      // The current NPC health HUD on scene.
@@ -23,7 +28,8 @@ namespace EnemyAI
 		private float originalBarScale;                             // The initial NPC health bar size.
 		private HealthBillboardManager healthUI;                    // The NPC health HUD.
 		private Animator anim;                                      // The NPC animator controller.
-		private StateController controller;                         // The NPC AI FSM controller.
+		private StateController controller; // The NPC AI FSM controller.
+		public int EnemyId { get; set; }
 
 		private void Awake()
 		{
@@ -51,7 +57,38 @@ namespace EnemyAI
 		}
 
 		// Receive damage from shots taken.
-		public override void TakeDamage(Vector3 location, Vector3 direction, float damage, Collider bodyPart, GameObject origin = null)
+		public override void TakeDamageMessageSender(Vector3 location, Vector3 direction, float damage, GameObject bodyPart, GameObject origin = null)
+		{
+			var healthManager = bodyPart.GetComponentInParent<HealthManager>();
+			var bodyPartId = 0;
+			for (int i = 0; i < healthManager.bodyParts.Count; i++)
+			{
+				if (healthManager.bodyParts[i] == bodyPart)
+				{
+					bodyPartId = i;
+				}
+			}
+			TakeDamageClientRPC(location, direction, damage, healthManager.NetworkBehaviourId, bodyPartId);
+		}
+
+		/*[ServerRpc]
+		private void TakeDamageServerRpc(Vector3 location, Vector3 direction, float damage, ushort receiverId,
+			int bodyPartId)
+		{
+			TakeDamageClientRPC(location, direction, damage, receiverId, bodyPartId);
+		}*/
+
+		[ClientRpc]
+		private void TakeDamageClientRPC(Vector3 location, Vector3 direction, float damage, ushort receiverId, int bodyPartId)
+		{
+			var receiver = GetNetworkBehaviour(receiverId);
+			var receiverHealthManager = receiver.GetComponent<HealthManager>();
+			var bodyPart = receiverHealthManager.bodyParts[bodyPartId];
+			receiverHealthManager.TakeDamage(location, direction, damage, bodyPart);
+		}
+
+		public override void TakeDamage(Vector3 location, Vector3 direction, float damage, GameObject bodyPart = null,
+			GameObject origin = null)
 		{
 			// Headshot multiplier. On default values, instantly kills NPC.
 			if (!dead && headshot && bodyPart.transform == anim.GetBoneTransform(HumanBodyBones.Head))
@@ -91,22 +128,21 @@ namespace EnemyAI
 				bodyPart.GetComponent<Rigidbody>().AddForce(100f * direction.normalized, ForceMode.Impulse);
 			}
 		}
-
+		
 		// Remove unecessary components on killed NPC and set as dead.
 		public void Kill()
 		{
 			// Destroy all other MonoBehaviour scripts attached to the NPC.
-			foreach (MonoBehaviour mb in this.GetComponents<MonoBehaviour>())
-			{
-				if (this != mb)
-					Destroy(mb);
-			}
 			Destroy(this.GetComponent<NavMeshAgent>());
+			Destroy(GetComponent<EnemyAnimation>());
+			Destroy(GetComponent<StateController>());
+			Destroy(GetComponent<EnemyFootsteps>());
 			RemoveAllForces();
 			anim.enabled = false;
 			Destroy(weapon.gameObject);
 			Destroy(hud.gameObject);
 			dead = true;
+			OnKilled?.Invoke(this);
 		}
 
 		// Update health bar HUD to current NPC health.

@@ -23964,7 +23964,6 @@ GameObject:
   - component: {fileID: 4054047206978882852}
   - component: {fileID: 7577389787304238111}
   - component: {fileID: 7577389787304238109}
-  - component: {fileID: 3019323938122156449}
   - component: {fileID: 2027358609853978316}
   m_Layer: 0
   m_Name: Soldado VR
@@ -24293,36 +24292,6 @@ MonoBehaviour:
       onRightFootstep:
         m_PersistentCalls:
           m_Calls: []
---- !u!114 &3019323938122156449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7343438104577543652}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  SyncPositionX: 1
-  SyncPositionY: 1
-  SyncPositionZ: 1
-  SyncRotAngleX: 1
-  SyncRotAngleY: 1
-  SyncRotAngleZ: 1
-  SyncScaleX: 0
-  SyncScaleY: 0
-  SyncScaleZ: 0
-  PositionThreshold: 0.001
-  RotAngleThreshold: 0.01
-  ScaleThreshold: 0.01
-  UseQuaternionSynchronization: 0
-  UseQuaternionCompression: 0
-  UseHalfFloatPrecision: 0
-  InLocalSpace: 0
-  Interpolate: 1
-  SlerpPosition: 0
 --- !u!114 &2027358609853978316
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -49140,6 +49109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 377872e46fd879b4fb11e0fdf8e0caab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodyParts: []
   dead: 0
 --- !u!114 &-1681794449301303562
 MonoBehaviour:
@@ -49175,6 +49145,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCamera: {fileID: 7577389786791199885}
   ovrManager: {fileID: 0}
+  networkSoldier: {fileID: 0}
+  ownSoldier: {fileID: 0}
 --- !u!1 &7577389786791199883
 GameObject:
   m_ObjectHideFlags: 0

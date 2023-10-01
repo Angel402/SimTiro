@@ -259,6 +259,7 @@ public class OVRCameraRig : NetworkBehaviour
         //If false is returned for any of these calls, then a new pose is not valid and thus should not be updated.
         if (updateEyeAnchors)
         {
+            if (!IsOwner) return;
             if (hmdPresent)
             {
                 Vector3 centerEyePosition = Vector3.zero;
@@ -315,6 +316,7 @@ public class OVRCameraRig : NetworkBehaviour
 
         if (updateHandAnchors)
         {
+            
             //Need this for controller offset because if we're on OpenVR, we want to set the local poses as specified by Unity, but if we're not, OVRInput local position is the right anchor
             if (OVRManager.loadedXRDevice == OVRManager.XRDevice.OpenVR)
             {
@@ -459,6 +461,19 @@ public class OVRCameraRig : NetworkBehaviour
             rightControllerAnchor.localRotation = rightOffsetPose.orientation;
             leftControllerAnchor.localPosition = leftOffsetPose.position;
             leftControllerAnchor.localRotation = leftOffsetPose.orientation;
+
+            HandsValuesServerRpc(rightControllerAnchor.position, rightHandAnchor.position,
+                rightHandAnchorDetached.position,
+                rightControllerInHandAnchor.position, rightHandOnControllerAnchor.position,
+                leftControllerAnchor.position, leftHandAnchor.position,
+                leftHandAnchorDetached.position, leftControllerInHandAnchor.position,
+                leftHandOnControllerAnchor.position, rightControllerAnchor.rotation, rightHandAnchor.rotation,
+                rightHandAnchorDetached.rotation,
+                rightControllerInHandAnchor.rotation, rightHandOnControllerAnchor.rotation,
+                leftControllerAnchor.rotation,
+                leftHandAnchor.rotation,
+                leftHandAnchorDetached.rotation, leftControllerInHandAnchor.rotation,
+                leftHandOnControllerAnchor.rotation);
         }
 
 #if USING_XR_SDK
@@ -478,6 +493,100 @@ public class OVRCameraRig : NetworkBehaviour
 #endif
         RaiseUpdatedAnchorsEvent();
         CheckForTrackingSpaceChangesAndRaiseEvent();
+    }
+
+    [ServerRpc]
+    private void HandsValuesServerRpc(Vector3 rightControllerAnchorPosition, Vector3 rightHandAnchorPosition,
+        Vector3 rightHandAnchorDetachedPosition,
+        Vector3 rightControllerInHandAnchorPosition, Vector3 rightHandOnControllerAnchorPosition,
+        Vector3 leftControllerAnchorPosition,
+        Vector3 leftHandAnchorPosition,
+        Vector3 leftHandAnchorDetachedPosition, Vector3 leftControllerInHandAnchorPosition,
+        Vector3 leftHandOnControllerAnchorPosition, Quaternion rightControllerAnchorRotation, Quaternion rightHandAnchorRotation,
+        Quaternion rightHandAnchorDetachedRotation,
+        Quaternion rightControllerInHandAnchorRotation, Quaternion rightHandOnControllerAnchorRotation,
+        Quaternion leftControllerAnchorRotation,
+        Quaternion leftHandAnchorRotation,
+        Quaternion leftHandAnchorDetachedRotation, Quaternion leftControllerInHandAnchorRotation,
+        Quaternion leftHandOnControllerAnchorRotation,
+        ServerRpcParams serverRpcParams = default)
+    {
+        HandsValuesClientRpc(NetworkObjectId, rightControllerAnchorPosition, rightHandAnchorPosition,
+            rightHandAnchorDetachedPosition,
+            rightControllerInHandAnchorPosition, rightHandOnControllerAnchorPosition, leftControllerAnchorPosition,
+            leftHandAnchorPosition, leftHandAnchorDetachedPosition, leftControllerInHandAnchorPosition,
+            leftHandOnControllerAnchorPosition, rightControllerAnchorRotation, rightHandAnchorRotation,
+            rightHandAnchorDetachedRotation, rightControllerInHandAnchorRotation,
+            rightHandOnControllerAnchorRotation,
+            leftControllerAnchorRotation, leftHandAnchorRotation,
+            leftHandAnchorDetachedRotation, leftControllerInHandAnchorRotation,
+            leftHandOnControllerAnchorRotation);
+    }
+
+    [ClientRpc]
+    private void HandsValuesClientRpc(ulong gameObjectP, Vector3 rightControllerAnchorPosition, Vector3 rightHandAnchorPosition,
+        Vector3 rightHandAnchorDetachedPosition,
+        Vector3 rightControllerInHandAnchorPosition, Vector3 rightHandOnControllerAnchorPosition,
+        Vector3 leftControllerAnchorPosition,
+        Vector3 leftHandAnchorPosition,
+        Vector3 leftHandAnchorDetachedPosition, Vector3 leftControllerInHandAnchorPosition,
+        Vector3 leftHandOnControllerAnchorPosition, Quaternion rightControllerAnchorRotation, Quaternion rightHandAnchorRotation,
+        Quaternion rightHandAnchorDetachedRotation,
+        Quaternion rightControllerInHandAnchorRotation, Quaternion rightHandOnControllerAnchorRotation,
+        Quaternion leftControllerAnchorRotation,
+        Quaternion leftHandAnchorRotation,
+        Quaternion leftHandAnchorDetachedRotation, Quaternion leftControllerInHandAnchorRotation,
+        Quaternion leftHandOnControllerAnchorRotation)
+    {
+        var networkBehaviour = GetNetworkObject(gameObjectP);
+        if (IsOwner) return;
+        networkBehaviour.GetComponentInChildren<OVRCameraRig>().SetHandsValues(rightControllerAnchorPosition, rightHandAnchorPosition,
+            rightHandAnchorDetachedPosition,
+            rightControllerInHandAnchorPosition, rightHandOnControllerAnchorPosition, leftControllerAnchorPosition,
+            leftHandAnchorPosition, leftHandAnchorDetachedPosition, leftControllerInHandAnchorPosition,
+            leftHandOnControllerAnchorPosition, rightControllerAnchorRotation, rightHandAnchorRotation,
+            rightHandAnchorDetachedRotation, rightControllerInHandAnchorRotation,
+            rightHandOnControllerAnchorRotation,
+            leftControllerAnchorRotation, leftHandAnchorRotation,
+            leftHandAnchorDetachedRotation, leftControllerInHandAnchorRotation,
+            leftHandOnControllerAnchorRotation);
+    }
+
+    private void SetHandsValues(Vector3 rightControllerAnchorPosition, Vector3 rightHandAnchorPosition,
+        Vector3 rightHandAnchorDetachedPosition,
+        Vector3 rightControllerInHandAnchorPosition, Vector3 rightHandOnControllerAnchorPosition,
+        Vector3 leftControllerAnchorPosition,
+        Vector3 leftHandAnchorPosition,
+        Vector3 leftHandAnchorDetachedPosition, Vector3 leftControllerInHandAnchorPosition,
+        Vector3 leftHandOnControllerAnchorPosition, Quaternion rightControllerAnchorRotation, Quaternion rightHandAnchorRotation,
+        Quaternion rightHandAnchorDetachedRotation,
+        Quaternion rightControllerInHandAnchorRotation, Quaternion rightHandOnControllerAnchorRotation,
+        Quaternion leftControllerAnchorRotation,
+        Quaternion leftHandAnchorRotation,
+        Quaternion leftHandAnchorDetachedRotation, Quaternion leftControllerInHandAnchorRotation,
+        Quaternion leftHandOnControllerAnchorRotation)
+    {
+        rightControllerAnchor.position = rightControllerAnchorPosition;
+        rightControllerAnchor.rotation = rightControllerAnchorRotation;
+        rightHandAnchor.position = rightHandAnchorPosition;
+        rightHandAnchor.rotation = rightHandAnchorRotation;
+        rightHandAnchorDetached.position = rightHandAnchorDetachedPosition;
+        rightHandAnchorDetached.rotation = rightHandAnchorDetachedRotation;
+        rightControllerInHandAnchor.position = rightControllerInHandAnchorPosition;
+        rightControllerInHandAnchor.rotation = rightControllerInHandAnchorRotation;
+        rightHandOnControllerAnchor.position = rightHandOnControllerAnchorPosition;
+        rightHandOnControllerAnchor.rotation = rightHandOnControllerAnchorRotation;
+        leftControllerAnchor.position = leftControllerAnchorPosition;
+        leftControllerAnchor.rotation = leftControllerAnchorRotation;
+        leftHandAnchor.position = leftHandAnchorPosition;
+        leftHandAnchor.rotation = leftHandAnchorRotation;
+        leftHandAnchorDetached.position = leftHandAnchorDetachedPosition;
+        leftHandAnchorDetached.rotation = leftHandAnchorDetachedRotation;
+        leftControllerInHandAnchor.position = leftControllerInHandAnchorPosition;
+        leftControllerInHandAnchor.rotation = leftControllerInHandAnchorRotation;
+        leftHandOnControllerAnchor.position = leftHandOnControllerAnchorPosition;
+        leftHandOnControllerAnchor.rotation = leftHandOnControllerAnchorRotation;
+
     }
 
     [ServerRpc]        
@@ -534,6 +643,7 @@ public class OVRCameraRig : NetworkBehaviour
     
     protected virtual void OnBeforeRenderCallback()
     {
+        if (!IsOwner) return;
         if (OVRManager.loadedXRDevice == OVRManager.XRDevice.Oculus) //Restrict late-update to only Oculus devices
         {
             bool controllersNeedUpdate = OVRManager.instance.LateControllerUpdate;
