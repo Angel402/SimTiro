@@ -11,6 +11,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/-- SIM TIRO---/Escenarios/Escena de Pruebas.unity
     guid: e45bd5206dde4b74d807686f4b0ecd36
+  - enabled: 1
+    path: Assets/Shift - Complete Sci-Fi UI/Scenes/Main Menu/Main Menu (Desktop).unity
+    guid: 96bf28a4f56bae0409cccd046c47d710
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: 423aa25eb9315b2449f7edee661b61f8, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: e87584ef5df5ec149afa8c1c60e4dd86, type: 2}

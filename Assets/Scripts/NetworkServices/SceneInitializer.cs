@@ -1,11 +1,12 @@
-﻿using Unity.Netcode;
+﻿using System;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace NetworkServices
 {
     public class SceneInitializer : NetworkBehaviour
     {
-        
+        [SerializeField] private Transform sceneCanvas;
         /*public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
@@ -16,5 +17,11 @@ namespace NetworkServices
             playerObject.GetComponent<PlayerObjectInitializer>().Initialize();
             playerObject.GetComponentInChildren<OVRManager>().InitOVRManager();
         }*/
+        private void Start()
+        {
+            var playerHealth = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<SimplePlayerHealth>();
+            playerHealth.enabled = true;
+            playerHealth.canvas = sceneCanvas;
+        }
     }
 }

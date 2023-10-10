@@ -6,7 +6,6 @@ namespace NetworkServices
     public class PlayerObjectInitializer : NetworkBehaviour
     {
         [SerializeField] private GameObject playerCamera;
-        [SerializeField] private OVRManager ovrManager;
         [SerializeField] private GameObject networkSoldier, ownSoldier;
 
         public override void OnNetworkSpawn()
