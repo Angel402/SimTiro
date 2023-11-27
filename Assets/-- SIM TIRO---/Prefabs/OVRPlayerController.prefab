@@ -29677,6 +29677,7 @@ GameObject:
   - component: {fileID: 7577389786800894325}
   - component: {fileID: 7577389786800894307}
   - component: {fileID: 7547941807219320005}
+  - component: {fileID: 6656066727989616662}
   m_Layer: 0
   m_Name: OVRCameraRig
   m_TagString: Untagged
@@ -29804,6 +29805,31 @@ MonoBehaviour:
   resetHmdPoseByMiddleMouseButton: 1
   activateKeys: 3201000031010000
   pitchKeys: 3401000033010000
+--- !u!114 &6656066727989616662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7577389786791199877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 32c8f22fe0169704e9c6a0d2534ee40a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  shotOrigin: {fileID: 7577389786791106733}
+  drawShotOrigin: {fileID: 7546107881496484538}
+  shotMask:
+    serializedVersion: 2
+    m_Bits: 1
+  weaponMode: 0
+  RPM: 600
+  _inputFire1: 0
+  Bullet: {fileID: -4123913612425422771, guid: f6847924cea12634886807fa45bf30e7, type: 3}
+  FirePosition: {fileID: 8798136226330216396}
+  audiosource: {fileID: 8798136227718638987}
+  clip: {fileID: 8300000, guid: d7f2e46d99e4a7146a78d77f8019e7f5, type: 3}
+  MuzzleFlash: {fileID: 7667537957416155644}
 --- !u!1 &7577389786791199879
 GameObject:
   m_ObjectHideFlags: 0

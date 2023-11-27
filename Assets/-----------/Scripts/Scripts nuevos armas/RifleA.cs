@@ -26,6 +26,7 @@ public class RifleA : MonoBehaviour
     }
     public void Shooting()
     {
-        Instantiate(Bullet, FirePosition.transform.position, FirePosition.transform.rotation);
+        var bala = Instantiate(Bullet, FirePosition.transform.position, FirePosition.transform.rotation).GetComponent<BulletA>();
+        bala.Configure(FirePosition.transform.forward, 10, SendMessageOptions.DontRequireReceiver);
     }
 }

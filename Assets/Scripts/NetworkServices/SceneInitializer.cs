@@ -1,4 +1,5 @@
 ﻿using System;
+using ServiceLocatorPath;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -22,6 +23,17 @@ namespace NetworkServices
             var playerHealth = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<SimplePlayerHealth>();
             playerHealth.enabled = true;
             playerHealth.canvas = sceneCanvas;
+            if (IsServer)
+            {
+                var mapsData = ServiceLocator.Instance.GetService<ITrainingDataService>().GetTrainingData();
+                foreach (var mapData in mapsData)
+                {
+                    foreach (var activeId in mapData.activesInMap)
+                    {
+                        NetworkManager.ConnectedClients[activeId].PlayerObject.gameObject.SetActive(true);
+                    }
+                }
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿/*using UnityEngine;
 using UnityEditor;
 using System.Collections;
 using System.IO;
@@ -70,6 +70,7 @@ public class ObjExporterScript
 	}
 }
 
+[CreateAssetMenu(menuName = "Create ObjExporter", fileName = "ObjExporter", order = 0)]
 public class ObjExporter : ScriptableObject
 {
 	[MenuItem ("File/Export/Wavefront OBJ")]
@@ -159,4 +160,4 @@ public class ObjExporter : ScriptableObject
 			sw.Write(s);
 		}
 	}
-}
+}*/

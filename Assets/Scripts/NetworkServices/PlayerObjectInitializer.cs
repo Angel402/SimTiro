@@ -11,6 +11,7 @@ namespace NetworkServices
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
+            gameObject.SetActive(false);
             if (IsOwner)
             {
                 /*networkSoldier.SetActive(false);

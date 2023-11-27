@@ -57,7 +57,7 @@ using UnityEngine.Rendering;
 #if USING_XR_SDK
 using UnityEngine.XR;
 using UnityEngine.Experimental.XR;
-using UnityEngine.XR.OpenXR;
+/*using UnityEngine.XR.OpenXR;*/
 #endif
 
 #if USING_XR_SDK_OPENXR

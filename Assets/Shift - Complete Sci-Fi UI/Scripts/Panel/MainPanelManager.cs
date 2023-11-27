@@ -76,7 +76,6 @@ namespace Michsky.UI.Shift
 
         public void OpenFirstTab()
         {
-            Debug.Log("log");
             if (currentPanelIndex != 0)
                 OpenPanel(panels[0].panelName);
         }

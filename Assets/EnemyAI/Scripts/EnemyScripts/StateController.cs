@@ -1,12 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityStandardAssets.Characters.FirstPerson;
 
 namespace EnemyAI
 {
 	// This class controls the NPC Finite State Machine (FSM).
-	public class StateController : MonoBehaviour
+	public class StateController : NetworkBehaviour
 	{
 		[Tooltip("NPC common stats.")]
 		public GeneralStats generalStats;
@@ -17,9 +21,37 @@ namespace EnemyAI
 		public State currentState;
 		[Tooltip("Dummy state reference, used by FSM decisions when not transitioning.")]
 		public State remainState;
-		[Space(10)]
-		[Tooltip("Target reference for aim.")]
-		public Transform aimTarget;
+		
+		/*[Tooltip("Target reference for aim.")]*/
+		public Transform aimTarget
+		{
+			get
+			{ 
+			 	var firstPersonControllers = FindObjectsOfType<OVRPlayerController>();
+			    var transforms = new List<Transform>();
+			    foreach (var firstPersonController in firstPersonControllers)
+			    {
+				    transforms.Add(firstPersonController.transform);
+			    }
+			    Transform nearestTransform = transforms[0];
+			    var nearestTransformsDistance = 1000f;
+			    
+			    foreach (var transform1 in transforms)
+			    {
+				    var distance = Vector3.Distance(transform1.position, transform.position);
+				    if (distance < nearestTransformsDistance)
+				    {
+					    nearestTransform = transform1;
+					    nearestTransformsDistance = distance;
+				    }
+			    }
+
+			    _aimTarget = nearestTransform;
+			    
+			    return _aimTarget;
+			}	
+		}
+		
 		[Tooltip("The location waypoints to patrol.")]
 		public List<Transform> patrolWayPoints;
 		[Tooltip("Current bullets on weapon mag.")]
@@ -54,10 +86,12 @@ namespace EnemyAI
 		private bool strafing;                                      // Is the NPC strafing?
 		private bool aiming;                                        // Is the NPC aiming?
 		private bool checkedOnLoop, blockedSight;                   // Blocked sight test related variables.
-
+		private Transform _aimTarget;
+		
 		// Reset cover position.
 		private void OnDestroy()
 		{
+			if (!NetworkManager.IsServer) return;
 			coverSpot.Remove(this.GetHashCode());
 		}
 
@@ -107,6 +141,7 @@ namespace EnemyAI
 
 		void Awake()
 		{
+			if (!NetworkManager.IsServer) return;
 			// Setup the references.
 			if (coverSpot == null)
 				coverSpot = new Dictionary<int, Vector3>();
@@ -135,17 +170,19 @@ namespace EnemyAI
 				coverLookup.Setup(generalStats.coverMask);
 			}
 			// Ensure the target has a health manager component to receive shots.
-			Debug.Assert(aimTarget.root.GetComponent<HealthManager>(), "You must add a health manager to the target");
+			/*Debug.Assert(aimTarget.root.GetComponent<HealthManager>(), "You must add a health manager to the target");*/
 		}
 
 		public void Start()
 		{
+			if (!NetworkManager.IsServer) return;
 			// Trigger initial state enable function.
 			currentState.OnEnableActions(this);
 		}
 
 		void Update()
 		{
+			if (!NetworkManager.IsServer) return;
 			// Reset blocked sight test on current game loop iteration.
 			checkedOnLoop = false;
 			// Do not execute FSM if AI is not active.
@@ -160,6 +197,7 @@ namespace EnemyAI
 		// Change the current FSM state (called externally).
 		public void TransitionToState(State nextState, Decision decision)
 		{
+			if (!NetworkManager.IsServer) return;
 			if (nextState != remainState)
 			{
 				// DEBUG: show state transitions for NPC.
@@ -181,6 +219,7 @@ namespace EnemyAI
 		// End the reload action (called by animator controller).
 		public void EndReloadWeapon()
 		{
+			if (!NetworkManager.IsServer) return;
 			reloading = false;
 			bullets = magBullets;
 		}

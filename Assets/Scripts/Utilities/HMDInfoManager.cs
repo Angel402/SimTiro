@@ -1,4 +1,4 @@
-﻿using System;
+﻿/*using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.XR.MockHMD;
@@ -63,7 +63,7 @@ namespace Utilities
     
         private void Start()
         {
-            /*StartCoroutine(StartXRCoroutine());*/
+            /*StartCoroutine(StartXRCoroutine());#1#
              if (!XRSettings.isDeviceActive)
             {
                 Debug.Log("Sin Lentes VR Asignados");
@@ -98,4 +98,4 @@ namespace Utilities
         }
 
     }
-}
+}*/

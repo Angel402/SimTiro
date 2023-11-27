@@ -342,6 +342,12 @@ MonoBehaviour:
     m_Bits: 12545
   weaponMode: 0
   RPM: 600
+  _inputFire1: 0
+  Bullet: {fileID: 0}
+  FirePosition: {fileID: 0}
+  audiosource: {fileID: 0}
+  clip: {fileID: 0}
+  MuzzleFlash: {fileID: 0}
 --- !u!1 &4835648599243375779
 GameObject:
   m_ObjectHideFlags: 0
@@ -356,6 +362,7 @@ GameObject:
   - component: {fileID: 4835648599248840643}
   - component: {fileID: 4835648599251017027}
   - component: {fileID: 4835648597919164423}
+  - component: {fileID: -5540911674015170808}
   m_Layer: 11
   m_Name: player
   m_TagString: Player
@@ -646,11 +653,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d2e7439bc9b350747b1ff7cdd4c29535, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  bodyParts: []
   dead: 0
   health: 100
   canvas: {fileID: 0}
   hurtPrefab: {fileID: 5542824109845126322, guid: 96c82f1df8075f24aa60ec228a6b40dc, type: 3}
   decayFactor: 0.8
+--- !u!114 &-5540911674015170808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4835648599243375779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 951099334
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
 --- !u!1 &4835648599671598446
 GameObject:
   m_ObjectHideFlags: 0
